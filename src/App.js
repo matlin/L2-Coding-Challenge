@@ -117,7 +117,6 @@ class App extends Component {
     //update counts of brands
     const oldBrand = this.state.items[key].brand;
     const newBrand = newItem.brand;
-    console.log(oldBrand, newBrand);
     if (oldBrand !== newBrand){
       let decrement = {[oldBrand]: this.state.brands[oldBrand]-1};
       let increment = {[newBrand]: this.state.brands[newBrand]+1 || 1}
@@ -127,7 +126,6 @@ class App extends Component {
   }
 
   render() {
-    //<FilterBar></FilterBar>
     const items = this.sort(this.filter(
       Object.values(this.state.items),
       this.state.filter
