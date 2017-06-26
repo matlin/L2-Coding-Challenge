@@ -10,35 +10,32 @@ const apiKey = "mawgr37qxcnnkdd7nmubgeje";
 class App extends Component {
   constructor() {
     super();
+    const items = JSON.parse(window.localStorage.getItem("items")) || {};
     this.state = {
       query: {},
       sortDirection: "ASC",
       sortColumn: "NONE",
       filters: "",
-      brands: {},
-      items: JSON.parse(window.localStorage.getItem("items")) || {}
+      brands: this.updateBrands(items),
+      items
     };
     this.api = new WalmartSearch(apiKey);
   }
 
-  componentDidMount(){
-    this.updateBrands();
-  }
-
   //gets all brands from items and updates states with counts
-  updateBrands(){
-    let brands = Object.values(this.state.items).reduce((acc, curr) => {
-      if (acc[curr.brand]) return Object.assign(acc, {[curr.brand]: acc[curr.brand]+1});
-      return Object.assign(acc, {[curr.brand]: 1});
-    }, {});
-    this.setState({brands});
+  updateBrands(items, oldItems = {}){
+    let brands = Object.values(items).reduce((acc, curr) => {
+      if (curr.brand == null) return acc;
+      if (acc[curr.brand]) return Object.assign({}, acc, {[curr.brand]: acc[curr.brand]+1});
+      return Object.assign({}, acc, {[curr.brand]: 1});
+    }, oldItems);
+    return brands;
   }
 
   //updates state and localStorage
   updateItems(newItems) {
     window.localStorage.setItem("items", JSON.stringify(newItems));
-    this.setState({ items:  newItems});
-    this.updateBrands();
+    this.setState({ items:  newItems, brands: this.updateBrands(newItems, this.state.brands)});
   }
 
   //takes a query and adds results to current collection of items

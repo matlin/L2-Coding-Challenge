@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from 'prop-types';
 import StyledComponent from "styled-components";
 import { FormGroup, FormControl, Button } from "react-bootstrap";
 
@@ -41,6 +42,10 @@ class QueryBar extends Component {
   addProducts = () => {
     this.props.addItems(this.state.searchParams);
   };
+
+  static propTypes = {
+    addItems: PropTypes.func.isRequired
+  }
 
   render() {
     return (

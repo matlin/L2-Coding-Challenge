@@ -1,9 +1,10 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import { Button } from "react-bootstrap";
 import StyledComponent from "styled-components";
 import ReactDataGrid from "react-data-grid";
 import Instructions from "./instructions.js";
-import { Editors} from "react-data-grid-addons";
+import { Editors } from "react-data-grid-addons";
 const { AutoComplete: AutoCompleteEditor } = Editors;
 
 const cellHeight = 70;
@@ -39,10 +40,18 @@ const SearchBar = StyledComponent.div`
 `;
 
 class ProductList extends React.Component {
-
-  createColumns = brands => {
-    const brandOptions = brands.map((brand, i) => ({ id: i, title: brand }));
-    const columns = [
+  constructor(props) {
+    super(props);
+    /*
+      Currently autocomplete is limited to intial prop values.
+      This is due to a limitation with React Data Grid editors that don't
+      allow updating prop values. A refresh will update the typeahead suggestions
+    */
+    const brandOptions = props.brands.map((brand, i) => ({
+      id: i,
+      title: brand
+    }));
+    this._columns = [
       {
         key: "prod",
         formatter: FormatName,
@@ -53,6 +62,7 @@ class ProductList extends React.Component {
       {
         key: "brand",
         name: "Brand Name",
+        editable: true,
         editor: <AutoCompleteEditor options={brandOptions} />,
         sortable: true,
         resizable: true
@@ -69,8 +79,7 @@ class ProductList extends React.Component {
         headerRenderer: <span className="glyphicon glyphicon-floppy-remove" />
       }
     ];
-    return columns;
-  };
+  }
 
   rowGetter(i) {
     if (this.props.loading) {
@@ -107,6 +116,16 @@ class ProductList extends React.Component {
     this.props.updateItem(fromRowData.key, updated);
   };
 
+  static propTypes = {
+    brands: PropTypes.arrayOf(PropTypes.string).isRequired,
+    totalItems: PropTypes.number.isRequired,
+    changeSort: PropTypes.func.isRequired,
+    removeItem: PropTypes.func.isRequired,
+    updateItem: PropTypes.func.isRequired,
+    updateFilter: PropTypes.func.isRequired,
+    items: PropTypes.arrayOf(PropTypes.object).isRequired
+  }
+
   render() {
     return (
       <div>
@@ -129,7 +148,7 @@ class ProductList extends React.Component {
         <ReactDataGrid
           enableCellSelect={true}
           onGridSort={this.props.changeSort}
-          columns={this.createColumns(this.props.brands)}
+          columns={this._columns}
           rowGetter={this.rowGetter.bind(this)}
           rowsCount={this.props.items.length}
           onGridRowsUpdated={this.handleGridRowsUpdated}
